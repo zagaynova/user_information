@@ -1,7 +1,6 @@
 {
   "name": "yo",
   "version": "1.0.0",
-  "description": "",
   "main": "app.js",
   "scripts": {
     "test": "node app.js peter"
@@ -10,5 +9,15 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.15.3"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zagaynova/user_information.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zagaynova/user_information/issues"
+  },
+  "homepage": "https://github.com/zagaynova/user_information#readme",
+  "description": ""
 }

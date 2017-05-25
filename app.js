@@ -3,30 +3,21 @@ var sayhellootje = require( './sayhello' )
 
 const pug = require('pug');
 var bodyParser = require('body-parser');
+var fs = require("fs");
 
 const app = express()
 
 app.use(bodyParser.urlencoded({ extended: true })); 
 
-const compiledFunction = pug.compileFile('searchbar.pug');
-
-//Search for users
-var fs = require("fs");
+const searchBarPage = pug.compileFile('searchbar.pug'); //form with pug
 
 
 var users = JSON.parse( fs.readFileSync("users.json") );
 
-var responseString = "";
-for (var i = 0; i < users.length; i++) {
-	responseString += users[i].firstname + ", ";
-	responseString += users[i].lastname + ", ";
-	responseString += users[i].email + "<br>";
-}
-
 function findUser(name) {
 	var result = "";
 	for (var i = 0; i < users.length; i++) {
-		if (users[i].firstname == name || users[i].lastname == name) {
+		if (users[i].firstname.toLowerCase() == name.toLowerCase() || users[i].lastname.toLowerCase() == name.toLowerCase()) {
 			result += users[i].firstname + ", ";
 			result += users[i].lastname + ", ";
 			result += users[i].email + "<br>";
@@ -35,20 +26,52 @@ function findUser(name) {
 	return result;
 }
 
+function showAllUsers(){
+	var result = "";
+	for (var i = 0; i < users.length; i++) {
+		result += users[i].firstname + ", ";
+		result += users[i].lastname + ", ";
+		result += users[i].email + "<br>";
+	}
+	return result;
+}
+
+function addUser(firstname, lastname, email){
+	var newUser = {
+		"firstname": firstname,
+		"lastname": lastname,
+		"email": email
+	};
+	users.push(newUser);
+	var jsonString = JSON.stringify(users, null, "\t");
+	fs.writeFile("users.json", jsonString, 'utf8', null);
+}
+
 app.get('/route1', (request, response) => {
     console.log('request.query is: ', request.query)
-	response.send(responseString)
+	response.send(showAllUsers())
 });
 
 app.get('/route2', (request, response) => {
     console.log('request.query is: ', request.query)
-	response.send(compiledFunction())
+	response.send(searchBarPage())
 });
 
 app.post('/route3', (request, response) => {
     console.log('request.query is: ', request.query)
     console.log(request.body.name)
 	response.send(findUser(request.body.name))
+});
+
+app.get('/route4', (request, response) => {
+    console.log('request.query is: ', request.query)
+	response.sendfile('adduser.html') //html ipv pug
+});
+
+app.post('/route5', (request, response) => {
+    console.log('request.query is: ', request.query)
+    addUser(request.body.firstname, request.body.lastname, request.body.email)
+	response.redirect('/route1')
 });
 
 const listener = app.listen(8080, () => {

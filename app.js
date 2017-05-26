@@ -1,40 +1,40 @@
 var express = require( 'express' )
-var sayhellootje = require( './sayhello' )
 
 const pug = require('pug');
-var bodyParser = require('body-parser');
+var bodyParser = require('body-parser'); //for post request routes
 var fs = require("fs");
 
 const app = express()
 
 app.use(bodyParser.urlencoded({ extended: true })); 
 
-const searchBarPage = pug.compileFile('searchbar.pug'); //form with pug
+const searchBarPage = pug.compileFile('./views/searchbar.pug'); //form with pug
+const addUserPage = pug.compileFile('./views/adduser.pug'); 
+const allUsersPage = pug.compileFile('./views/allusers.pug'); 
 
+var users = JSON.parse( fs.readFileSync("users.json") ); //van string in .json file naar array for all users list
 
-var users = JSON.parse( fs.readFileSync("users.json") );
-
-function findUser(name) {
+function findUser(name) { //http://twitter.github.io/typeahead.js/examples/
 	var result = "";
-	for (var i = 0; i < users.length; i++) {
+	for (var i = 0; i < users.length; i++) { //search in var users
 		if (users[i].firstname.toLowerCase() == name.toLowerCase() || users[i].lastname.toLowerCase() == name.toLowerCase()) {
-			result += users[i].firstname + ", ";
+			result += users[i].firstname + " ";
 			result += users[i].lastname + ", ";
-			result += users[i].email + "<br>";
+			result += users[i].email;
 		}
 	}
 	return result;
 }
 
-function showAllUsers(){
-	var result = "";
+function arrayOfAllUsers(){
+	var result = [];
 	for (var i = 0; i < users.length; i++) {
-		result += users[i].firstname + ", ";
-		result += users[i].lastname + ", ";
-		result += users[i].email + "<br>";
+		var user = users[i].firstname + " " + users[i].lastname + ", " + users[i].email
+		result.push(user);
 	}
 	return result;
 }
+var iu = 8009;
 
 function addUser(firstname, lastname, email){
 	var newUser = {
@@ -49,7 +49,8 @@ function addUser(firstname, lastname, email){
 
 app.get('/route1', (request, response) => {
     console.log('request.query is: ', request.query)
-	response.send(showAllUsers())
+	// response.send(showAllUsers())
+	response.send(allUsersPage({"users": arrayOfAllUsers()}))
 });
 
 app.get('/route2', (request, response) => {
@@ -59,13 +60,14 @@ app.get('/route2', (request, response) => {
 
 app.post('/route3', (request, response) => {
     console.log('request.query is: ', request.query)
-    console.log(request.body.name)
-	response.send(findUser(request.body.name))
+    // console.log(request.body.name) //which user is searched for
+	response.send(searchBarPage({"searchresult": findUser(request.body.name)}))
 });
 
 app.get('/route4', (request, response) => {
     console.log('request.query is: ', request.query)
-	response.sendfile('adduser.html') //html ipv pug
+	// response.sendfile('adduser.html') //html ipv pug
+	response.send(addUserPage())
 });
 
 app.post('/route5', (request, response) => {
@@ -74,7 +76,7 @@ app.post('/route5', (request, response) => {
 	response.redirect('/route1')
 });
 
-const listener = app.listen(8080, () => {
+const listener = app.listen(80, () => {
     console.log('server has started at ', listener.address().port)
 })
 

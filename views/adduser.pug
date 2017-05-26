@@ -1,0 +1,20 @@
+doctype html
+html
+  head
+    title Add User
+  body
+    include navbar.pug
+
+    h1 Add User Form
+    | &#x9;
+    form(action='/route5', method='POST')
+      input(type='text', name='firstname', placeholder='First Name', required=true)
+      br
+      |   &#x9;&#x9;
+      input(type='text', name='lastname', placeholder='Last Name', required=true)
+      br
+      |   &#x9;&#x9;
+      input(type='email', name='email', placeholder='user@mail.com', required=true)
+      br
+      |   &#x9;&#x9;
+      input(type='submit', value='Add User')

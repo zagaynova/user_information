@@ -1,6 +1,15 @@
+doctype html
 html
-	body
-		include navbar.pug
-		ul(style='list-style-type: none;')
-			each user in users
-				li= user
+	head
+		title All Users
+		body
+			include navbar.pug
+		
+.container
+	.row
+		.col-xs-6.offset-xs-3
+			h1.text-xs-center All Amazing Users
+			hr
+	ul(style='list-style-type: none;')
+		each user in users
+			li= user
